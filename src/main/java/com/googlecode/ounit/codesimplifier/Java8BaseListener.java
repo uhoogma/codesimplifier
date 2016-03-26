@@ -1,5 +1,5 @@
 // Generated from /home/urmas/NetBeansProjects/SimpleCalc/src/simplecalc/javasimple/Java8.g4 by ANTLR 4.4
-package com.googlecode.ounit.codesimplifier;
+package main.java.com.googlecode.ounit.codesimplifier;
 
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.misc.NotNull;

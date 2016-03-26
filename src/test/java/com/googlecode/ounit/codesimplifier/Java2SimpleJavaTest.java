@@ -1,12 +1,11 @@
-package com.googlecode.ounit.codesimplifier;
+package test.java.com.googlecode.ounit.codesimplifier;
 
-import com.googlecode.ounit.codesimplifier.processing.FunctionListener;
-import com.googlecode.ounit.codesimplifier.processing.PreSimplifier;
-import com.googlecode.ounit.codesimplifier.processing.RemoveConditionals;
-import com.googlecode.ounit.codesimplifier.processing.RemoveExpressionStatements;
-import com.googlecode.ounit.codesimplifier.processing.RemoveLoops;
-import com.googlecode.ounit.codesimplifier.processing.RemoveUserDefinedFunctions;
-import com.googlecode.ounit.codesimplifier.testcode.ExpectedResults;
+import main.java.com.googlecode.ounit.codesimplifier.processing.FunctionListener;
+import main.java.com.googlecode.ounit.codesimplifier.processing.PreSimplifier;
+import main.java.com.googlecode.ounit.codesimplifier.processing.RemoveConditionals;
+import main.java.com.googlecode.ounit.codesimplifier.processing.RemoveExpressionStatements;
+import main.java.com.googlecode.ounit.codesimplifier.processing.RemoveLoops;
+import main.java.com.googlecode.ounit.codesimplifier.processing.RemoveUserDefinedFunctions;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -16,7 +15,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import junit.framework.Assert;
+import main.java.com.googlecode.ounit.codesimplifier.Java8Lexer;
+import main.java.com.googlecode.ounit.codesimplifier.Java8Parser;
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.RuleContext;
@@ -27,6 +27,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import static org.junit.Assert.*;
+import test.java.com.googlecode.ounit.codesimplifier.testcode.ExpectedResults;
 
 public class Java2SimpleJavaTest {
 
@@ -49,25 +50,20 @@ public class Java2SimpleJavaTest {
     public void tearDown() {
     }
 
-    @Test
-    public void trg() {
-        assertEquals(1L, 1L);
-    }
-
     public static List<String> removeMainMethod(Set<String> methods) {
         List<String> methodNames = new ArrayList<>();
         methodNames.addAll(methods);
         methodNames.removeAll(new ArrayList<>(Arrays.asList("main")));
         return methodNames;
     }
-    
+
     @Test(timeout = 120000)
-    public void Java2SimpleJavaTest(){
+    public void Java2SimpleJavaTest() {
         // preparing a file
         String inputFile = null;
         try {
             inputFile = new String(Files.readAllBytes(Paths.get(
-                    "/home/urmas/NetBeansProjects/Antlr4/src/com/googlecode/ounit/codesimplifier/testcode/Input2.java")));
+                    "/home/urmas/NetBeansProjects/Antlr4/src/test/java/com/googlecode/ounit/codesimplifier/testcode/Input2.java")));
         } catch (IOException ex) {
             Logger.getLogger(Java2SimpleJavaTest.class.getName()).log(Level.SEVERE, null, ex);
         }

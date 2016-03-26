@@ -1,4 +1,6 @@
 build/**
 nbproject/**
 src/antlr4/**
+lib/**
+
 *.jar

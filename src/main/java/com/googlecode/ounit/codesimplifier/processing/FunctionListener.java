@@ -1,7 +1,7 @@
-package com.googlecode.ounit.codesimplifier.processing;
+package main.java.com.googlecode.ounit.codesimplifier.processing;
 
-import com.googlecode.ounit.codesimplifier.Java8BaseListener;
-import com.googlecode.ounit.codesimplifier.Java8Parser;
+import main.java.com.googlecode.ounit.codesimplifier.Java8BaseListener;
+import main.java.com.googlecode.ounit.codesimplifier.Java8Parser;
 import java.util.Set;
 import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.misc.OrderedHashSet;
