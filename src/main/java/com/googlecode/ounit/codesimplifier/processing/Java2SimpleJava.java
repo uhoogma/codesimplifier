@@ -79,7 +79,7 @@ public class Java2SimpleJava {
          7a. user defined functions -remove all
          7b. system calls - keep intact 
          */
-        RemoveUserDefinedFunctions removeUserDefinedFunctions = new RemoveUserDefinedFunctions(tokens, removeLoops.rewriter, declaredMethods);
+        RemoveUserDefinedFunctions removeUserDefinedFunctions = new RemoveUserDefinedFunctions(removeLoops.rewriter, declaredMethods);
         walker.walk(removeUserDefinedFunctions, tree);
         String afterRemoveUserDefinedFunctions = removeUserDefinedFunctions.rewriter.getText();
         System.out.println("afterRemoveUserDefinedFunctions:\n" + afterRemoveUserDefinedFunctions);

@@ -36,4 +36,7 @@ public class RemoveExpressionStatements extends Java8BaseListener {
         this.rewriter = rewriter;
         tokensToRemove = new ArrayList<>();
     }
+    
+    
+    
 }
