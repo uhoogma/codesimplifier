@@ -2,11 +2,11 @@ package main.java.com.googlecode.ounit.codesimplifier.processing;
 
 import main.java.com.googlecode.ounit.codesimplifier.Java8BaseListener;
 import main.java.com.googlecode.ounit.codesimplifier.Java8Parser;
-import java.util.ArrayList;
 import java.util.List;
+import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.BufferedTokenStream;
-import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.TokenStreamRewriter;
+import org.antlr.v4.runtime.misc.Interval;
 import org.antlr.v4.runtime.misc.NotNull;
 
 public class RemoveConditionals extends Java8BaseListener {
@@ -24,44 +24,42 @@ public class RemoveConditionals extends Java8BaseListener {
 
     BufferedTokenStream tokens;
     public TokenStreamRewriter rewriter;
-    List<Integer> tokensToRemove;
 
     public RemoveConditionals(BufferedTokenStream tokens, TokenStreamRewriter rewriter) {
         this.tokens = tokens;
         this.rewriter = rewriter;
-        tokensToRemove = new ArrayList<>();
     }
 
-    // todo expression varaable better handling
     @Override
     public void enterIfThenStatement(@NotNull Java8Parser.IfThenStatementContext ctx) {
-        List<Token> conditionalTokens
-                = tokens.getTokens(ctx.getStart().getTokenIndex(), ctx.getStop().getTokenIndex());
-        System.out.println("if then else " + conditionalTokens.get(2).toString());
-        rewriter.replace(conditionalTokens.get(2).getTokenIndex(), "n");
+        Interval interval = ctx.children.get(2).getSourceInterval();
+        Util.removeChildsTokens(interval, rewriter);
     }
 
     @Override
     public void enterIfThenElseStatement(@NotNull Java8Parser.IfThenElseStatementContext ctx) {
-        List<Token> conditionalTokens
-                = tokens.getTokens(ctx.getStart().getTokenIndex(), ctx.getStop().getTokenIndex());
-        System.out.println("if then else " + conditionalTokens.get(2).toString());
-        rewriter.replace(conditionalTokens.get(2).getTokenIndex(), "n");
+        Interval interval = ctx.children.get(2).getSourceInterval();
+        Util.removeChildsTokens(interval, rewriter);
     }
 
     @Override
     public void enterIfThenElseStatementNoShortIf(@NotNull Java8Parser.IfThenElseStatementNoShortIfContext ctx) {
-        List<Token> conditionalTokens
-                = tokens.getTokens(ctx.getStart().getTokenIndex(), ctx.getStop().getTokenIndex());
-        System.out.println("if then else " + conditionalTokens.get(2).toString());
-        rewriter.replace(conditionalTokens.get(2).getTokenIndex(), "n");
+        Interval interval = ctx.children.get(2).getSourceInterval();
+        Util.removeChildsTokens(interval, rewriter);
     }
 
     @Override
     public void enterSwitchStatement(@NotNull Java8Parser.SwitchStatementContext ctx) {
-        List<Token> conditionalTokens
-                = tokens.getTokens(ctx.getStart().getTokenIndex(), ctx.getStop().getTokenIndex());
-        System.out.println("if then else " + conditionalTokens.get(2).toString());
-        rewriter.replace(conditionalTokens.get(2).getTokenIndex(), "n");
+        Interval interval = ctx.children.get(2).getSourceInterval();
+        Util.removeChildsTokens(interval, rewriter);
+    }
+
+    @Override
+    public void enterSwitchLabel(@NotNull Java8Parser.SwitchLabelContext ctx) {
+        List<ParseTree> pt = ctx.children;
+        if (pt.size() == 3) {
+            Interval interval = ctx.children.get(1).getSourceInterval();
+            Util.removeChildsTokens(interval, rewriter);
+        }
     }
 }

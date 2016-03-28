@@ -7,7 +7,10 @@ import java.util.List;
 import org.antlr.v4.runtime.BufferedTokenStream;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.TokenStreamRewriter;
+import org.antlr.v4.runtime.misc.Interval;
 import org.antlr.v4.runtime.misc.NotNull;
+import org.antlr.v4.runtime.tree.ParseTree;
+import org.antlr.v4.runtime.tree.TerminalNode;
 
 public class RemoveUserDefinedFunctions extends Java8BaseListener {
     /* 
@@ -35,74 +38,92 @@ public class RemoveUserDefinedFunctions extends Java8BaseListener {
     }
 
     boolean insideMethodInvocation = false;
-    boolean insideBefore = false;
-    boolean insideArgumentList = false;
 
     @Override
     public void enterMethodInvocation(@NotNull Java8Parser.MethodInvocationContext ctx) {
         insideMethodInvocation = true;
         List<Token> methodname
                 = tokens.getTokens(ctx.getStart().getTokenIndex(), ctx.getStop().getTokenIndex());
-        if (ctx.Identifier() != null) { // methodName is at the first level
-            // handle before
-            insideBefore = true;
-            // handle nameidentifier
-            String methodName = ctx.Identifier().getText();
-            //if (!declaredFunctions.contains(methodName)) {
-            // remove from tokens
-            int g = 0;
-
-            for (int i = 0; i < methodname.size(); i++) {
-                if (methodname.get(i).getText().equals(methodName)) {
-                    g = i;
-                }
-            }
-            tokensToRemove.add(methodname.get(g).getTokenIndex());
+        TerminalNode id = ctx.Identifier();
+        if (id != null && declaredFunctions.contains(id.getText())) { // methodName is at the first level
+            String methodName = id.getText();
+            tokensToRemove.add(0, methodname.get(0).getTokenIndex());
             System.out.println("methodinvocation deleting function name " + methodName);
-
-            // }
-            insideArgumentList = true;
-            // handle argumentlist
-        } else {// methodName is one level deeper
-            // handle before
-            insideBefore = true;
-            // handle argumentlist
-            insideArgumentList = true;
+            List<ParseTree> pt = ctx.children;
+            for (int i = 0; i < pt.size(); i++) {
+                Interval interval = ctx.children.get(i).getSourceInterval();
+                Util.removeChildsTokens(interval, rewriter);
+            }
         }
     }
 
     @Override
     public void exitMethodInvocation(@NotNull Java8Parser.MethodInvocationContext ctx) {
-        // kui on enda deklareeritud meetod kustuta kõik tokenid enne identifierit ja ka identifier
-        List<Token> methodname
-                = tokens.getTokens(ctx.getStart().getTokenIndex(), ctx.getStop().getTokenIndex());
-        if (tokensToRemove.size() > 0) {
-            for (Token token : methodname) {
-                if (token.getTokenIndex() <= tokensToRemove.get(0)) {
-                    // rewriter.delete(token);
-                    System.out.println("deleting token" + token.getText());
-                }
+        // kui on enda deklareeritud meetod kustuta kõik childrenid
+        TerminalNode id = ctx.Identifier();
+        if (id != null && declaredFunctions.contains(id.getText())) {
+            List<ParseTree> pt = ctx.children;
+            for (int i = 0; i < pt.size(); i++) {
+                Interval interval = ctx.children.get(i).getSourceInterval();
+                Util.removeChildsTokens(interval, rewriter);
             }
-            // tokensToRemove.remove(0);
         }
-        System.out.println("tokens " + tokensToRemove.toString());
+        insideMethodInvocation = false;
+    }
 
+    // 2nd level
+    @Override
+    public void enterMethodName(@NotNull Java8Parser.MethodNameContext ctx) {
+        TerminalNode id = ctx.Identifier();
+        if (insideMethodInvocation && id != null && declaredFunctions.contains(id.getText())) {
+            List<ParseTree> pt = ctx.children;
+            for (int i = 0; i < pt.size(); i++) {
+                Interval interval = ctx.children.get(i).getSourceInterval();
+                Util.removeChildsTokens(interval, rewriter);
+            }
+        }
+        insideMethodInvocation = false;
     }
 
     @Override
-    public void enterMethodName(@NotNull Java8Parser.MethodNameContext ctx) {
+    public void enterMethodInvocation_lf_primary(@NotNull Java8Parser.MethodInvocation_lf_primaryContext ctx) {
+        TerminalNode id = ctx.Identifier();
+        if (insideMethodInvocation && id != null && declaredFunctions.contains(id.getText())) {
+            List<ParseTree> pt = ctx.children;
+            for (int i = 0; i < pt.size(); i++) {
+                Interval interval = ctx.children.get(i).getSourceInterval();
+                Util.removeChildsTokens(interval, rewriter);
+            }
+        }
+        insideMethodInvocation = false;
+    }
+
+    @Override
+    public void enterMethodInvocation_lfno_primary(@NotNull Java8Parser.MethodInvocation_lfno_primaryContext ctx) {
+        insideMethodInvocation = true;
         List<Token> methodname
                 = tokens.getTokens(ctx.getStart().getTokenIndex(), ctx.getStop().getTokenIndex());
-        if (insideMethodInvocation) {
-            String methodName = ctx.Identifier().getText();
-            int g = 0;
-            for (int i = 0; i < methodname.size(); i++) {
-                if (methodname.get(i).getText().equals(methodName)) {
-                    g = i;
-                }
+        TerminalNode id = ctx.Identifier();
+        if (id != null && declaredFunctions.contains(id.getText())) { // methodName is at the first level
+            tokensToRemove.add(0, methodname.get(0).getTokenIndex());
+            List<ParseTree> pt = ctx.children;
+            for (int i = 0; i < pt.size(); i++) {
+                Interval interval = ctx.children.get(i).getSourceInterval();
+                Util.removeChildsTokens(interval, rewriter);
             }
-            tokensToRemove.add(methodname.get(g).getTokenIndex());
-            System.out.println("methodinvocation deleting function name one level deeper " + methodName);
+        }
+    }
+
+    @Override
+    public void exitMethodInvocation_lfno_primary(@NotNull Java8Parser.MethodInvocation_lfno_primaryContext ctx) {
+        // kui on enda deklareeritud meetod kustuta kõik childrenid
+        TerminalNode id = ctx.Identifier();
+        if (id != null && declaredFunctions.contains(id.getText())) {
+            List<ParseTree> pt = ctx.children;
+            for (int i = 0; i < pt.size(); i++) {
+                Interval interval = ctx.children.get(i).getSourceInterval();
+                Util.removeChildsTokens(interval, rewriter);
+            }
         }
     }
 }

@@ -8,10 +8,7 @@ import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.TokenStreamRewriter;
 import org.antlr.v4.runtime.misc.NotNull;
 
-/**
- *
- * @author urmas
- */
+
 public class PreSimplifier extends Java8BaseListener {
 
     BufferedTokenStream tokens;
@@ -40,11 +37,9 @@ public class PreSimplifier extends Java8BaseListener {
         List<Token> annotationTokens
                 = tokens.getTokens(ctx.getStart().getTokenIndex(), ctx.getStop().getTokenIndex());
         if (annotationTokens != null) {
-            for (Token annotationToken : annotationTokens) {
-                if (annotationToken != null) {
-                    rewriter.delete(annotationToken.getTokenIndex());
-                }
-            }
+            annotationTokens.stream().filter((annotationToken) -> (annotationToken != null)).forEach((annotationToken) -> {
+                rewriter.delete(annotationToken.getTokenIndex());
+            });
         }
     }
 
@@ -70,11 +65,12 @@ public class PreSimplifier extends Java8BaseListener {
         List<Token> variableDeclarationTokens
                 = tokens.getTokens(ctx.getStart().getTokenIndex(), ctx.getStop().getTokenIndex());
         if (variableDeclarationTokens != null) {
-            for (Token variableDeclarationToken : variableDeclarationTokens) {
-                if (variableDeclarationToken != null) {
-                    rewriter.delete(variableDeclarationToken.getTokenIndex());
-                }
-            }
+            variableDeclarationTokens
+                    .stream()
+                    .filter((variableDeclarationToken) -> (variableDeclarationToken != null))
+                    .forEach((variableDeclarationToken) -> {
+                        rewriter.delete(variableDeclarationToken.getTokenIndex());
+                    });
         }
     }
 
@@ -107,13 +103,13 @@ public class PreSimplifier extends Java8BaseListener {
         List<Token> literalTokens
                 = tokens.getTokens(ctx.getStart().getTokenIndex(), ctx.getStop().getTokenIndex());
         if (literalTokens != null) {
-            for (Token literalToken : literalTokens) {
-                // matching (optional) String with following escapeSequence
-                if (literalToken != null && literalToken.getText().matches("\"(?s).*\"")) {
-                    System.out.println("literaltoken" + literalToken);
-                    rewriter.replace(literalToken.getTokenIndex(), "\"\"");
-                }
-            }
+            literalTokens
+                    .stream()
+                    .filter((literalToken) -> (literalToken != null && literalToken.getText().matches("\"(?s).*\"")))
+                    .forEach((literalToken) -> {
+                        // System.out.println("literaltoken" + literalToken);
+                        rewriter.replace(literalToken.getTokenIndex(), "\"\"");
+                    }); // matching (optional) String with following escapeSequence
         }
     }
 
@@ -131,11 +127,12 @@ public class PreSimplifier extends Java8BaseListener {
         List<Token> returnStatementTokens
                 = tokens.getTokens(ctx.getStart().getTokenIndex(), ctx.getStop().getTokenIndex());
         if (returnStatementTokens != null) {
-            for (Token returnStatementToken : returnStatementTokens) {
-                if (returnStatementToken != null) {
-                    rewriter.delete(returnStatementToken.getTokenIndex());
-                }
-            }
+            returnStatementTokens
+                    .stream()
+                    .filter((returnStatementToken) -> (returnStatementToken != null))
+                    .forEach((returnStatementToken) -> {
+                        rewriter.delete(returnStatementToken.getTokenIndex());
+                    });
         }
     }
 }

@@ -1,4 +1,4 @@
-package test.java.com.googlecode.ounit.codesimplifier.testcode;
+package main.java.com.googlecode.ounit.codesimplifier.testcode;
 /**
  * @author Urmas Hoogma
  */

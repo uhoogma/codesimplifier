@@ -1,8 +1,7 @@
-package test.java.com.googlecode.ounit.codesimplifier.testcode;
+package main.java.com.googlecode.ounit.codesimplifier.testcode;
 
 import java.util.ArrayList;
 import java.util.List;
-
 
 /**
  *
@@ -30,6 +29,9 @@ public class Input2 {
                 System.out.printf("this must go", y[other]);
                 System.out.printf("this must go");
             }
+            if (false) {
+                foo();
+            }
             ptr = y[0];
             for (other = 0, allTogether = 0; other < number; other++) {
                 allTogether += (ptr + other);
@@ -55,8 +57,10 @@ public class Input2 {
             int f; // discard
         }
         // basicForStatementNoShortIf
-        for (int i = 0; i < (int) Math.PI+7; i++) {
-            System.err.println("content"); // keep
+        for (int i = 0; i < (int) Math.PI + 7; i++) {
+            for (int j = 0; j < 10; j++) {
+                System.err.println("content"); // keep
+            }
         }         // enhancedForStatement
         for (String str : stringList) {
             System.out.printf("%w", str); // keep
@@ -92,7 +96,7 @@ public class Input2 {
             if (h1 < 0) {
                 a = -1;
             }
-        } else {
+        } else if(h1 < (0+0)) {
             a = -1;
         }
         // ifThenElseStatementNoShortIf

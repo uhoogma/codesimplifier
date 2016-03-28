@@ -1,11 +1,5 @@
-package test.java.com.googlecode.ounit.codesimplifier;
+package main.java.com.googlecode.ounit.codesimplifier.processing;
 
-import main.java.com.googlecode.ounit.codesimplifier.processing.FunctionListener;
-import main.java.com.googlecode.ounit.codesimplifier.processing.PreSimplifier;
-import main.java.com.googlecode.ounit.codesimplifier.processing.RemoveConditionals;
-import main.java.com.googlecode.ounit.codesimplifier.processing.RemoveExpressionStatements;
-import main.java.com.googlecode.ounit.codesimplifier.processing.RemoveLoops;
-import main.java.com.googlecode.ounit.codesimplifier.processing.RemoveUserDefinedFunctions;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -21,34 +15,8 @@ import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.RuleContext;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
-import static org.junit.Assert.*;
-import test.java.com.googlecode.ounit.codesimplifier.testcode.ExpectedResults;
 
-public class Java2SimpleJavaTest {
-
-    public Java2SimpleJavaTest() {
-    }
-
-    @BeforeClass
-    public static void setUpClass() {
-    }
-
-    @AfterClass
-    public static void tearDownClass() {
-    }
-
-    @Before
-    public void setUp() {
-    }
-
-    @After
-    public void tearDown() {
-    }
+public class Java2SimpleJava {
 
     public static List<String> removeMainMethod(Set<String> methods) {
         List<String> methodNames = new ArrayList<>();
@@ -57,15 +25,14 @@ public class Java2SimpleJavaTest {
         return methodNames;
     }
 
-    @Test(timeout = 120000)
-    public void Java2SimpleJavaTest() {
+    public static void main(String[] args) {
         // preparing a file
         String inputFile = null;
         try {
             inputFile = new String(Files.readAllBytes(Paths.get(
-                    "/home/urmas/NetBeansProjects/Antlr4/src/test/java/com/googlecode/ounit/codesimplifier/testcode/Input2.java")));
+                    "/home/urmas/NetBeansProjects/Antlr4/src/main/java/com/googlecode/ounit/codesimplifier/testcode/Input2.java")));
         } catch (IOException ex) {
-            Logger.getLogger(Java2SimpleJavaTest.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(Java2SimpleJava.class.getName()).log(Level.SEVERE, null, ex);
         }
         ANTLRInputStream input = new ANTLRInputStream(inputFile);
         Java8Lexer lexer = new Java8Lexer(input);
@@ -77,7 +44,7 @@ public class Java2SimpleJavaTest {
         FunctionListener collector = new FunctionListener();
         walker.walk(collector, tree);
         List<String> declaredMethods = removeMainMethod(collector.getFunctions());
-        System.out.println("declaredMethods: " + declaredMethods.toString());
+        System.out.println("declaredMethods:\n" + declaredMethods.toString());
         /*
          PreSimplifier
          1. annotations - remove including "@"
@@ -89,20 +56,24 @@ public class Java2SimpleJavaTest {
         PreSimplifier preSimplifier = new PreSimplifier(tokens);
         walker.walk(preSimplifier, tree);
         String afterPresimplifier = preSimplifier.rewriter.getText();
-        System.out.println(afterPresimplifier);
-        assertEquals(ExpectedResults.AFTER_PRESIMPLIFIER, afterPresimplifier);
+        System.out.println("afterPresimplifier:\n" + afterPresimplifier);
+
         /* 
          RemoveConditionals 
          8. conditionals -keep only control flow structures 
          */
         RemoveConditionals removeConditionals = new RemoveConditionals(tokens, preSimplifier.rewriter);
         walker.walk(removeConditionals, tree);
+        String afterRemoveConditionals = removeConditionals.rewriter.getText();
+        System.out.println("afterRemoveConditionals:\n" + afterRemoveConditionals);
         /* 
          RemoveLoops 
          9. loops - remove conditions
          */
         RemoveLoops removeLoops = new RemoveLoops(tokens, removeConditionals.rewriter);
         walker.walk(removeLoops, tree);
+        String afterRemoveLoops = removeLoops.rewriter.getText();
+        System.out.println("afterRemoveLoops:\n" + afterRemoveLoops);
         /* 
          RemoveUserDefinedFunctions 
          7a. user defined functions -remove all
@@ -110,7 +81,8 @@ public class Java2SimpleJavaTest {
          */
         RemoveUserDefinedFunctions removeUserDefinedFunctions = new RemoveUserDefinedFunctions(tokens, removeLoops.rewriter, declaredMethods);
         walker.walk(removeUserDefinedFunctions, tree);
-
+        String afterRemoveUserDefinedFunctions = removeUserDefinedFunctions.rewriter.getText();
+        System.out.println("afterRemoveUserDefinedFunctions:\n" + afterRemoveUserDefinedFunctions);
         /* 
          RemoveExpressionStatements (InUserFunctionCalls)
          5a. expression statement in system call - keep
