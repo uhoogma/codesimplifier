@@ -18,19 +18,18 @@ import org.antlr.v4.runtime.tree.ParseTreeWalker;
 
 public class Java2SimpleJava {
 
-    public static List<String> removeMainMethod(Set<String> methods) {
-        List<String> methodNames = new ArrayList<>();
-        methodNames.addAll(methods);
-        methodNames.removeAll(new ArrayList<>(Arrays.asList("main")));
-        return methodNames;
-    }
+    static final String FILE_PATH = "/home/urmas/NetBeansProjects/Antlr4/src/main/java/com/googlecode/ounit/codesimplifier/testcode/";
 
     public static void main(String[] args) {
-        // preparing a file
+        // processFile(FILE_PATH, "Input2.java");
+        processFile(FILE_PATH, "Quaternion.java");
+    }
+
+    private static String processFile(String filePath, String fileName) {
         String inputFile = null;
         try {
             inputFile = new String(Files.readAllBytes(Paths.get(
-                    "/home/urmas/NetBeansProjects/Antlr4/src/main/java/com/googlecode/ounit/codesimplifier/testcode/Input2.java")));
+                    filePath + fileName)));
         } catch (IOException ex) {
             Logger.getLogger(Java2SimpleJava.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -88,11 +87,31 @@ public class Java2SimpleJava {
          5a. expression statement in system call - keep
          5b. expression statement other - remove 
          */
-        RemoveExpressionStatements removeExpressionStatements = new RemoveExpressionStatements(tokens, removeUserDefinedFunctions.rewriter, declaredMethods);
+        RemoveExpressionStatements removeExpressionStatements = new RemoveExpressionStatements(removeUserDefinedFunctions.rewriter);
         walker.walk(removeExpressionStatements, tree);
+        String afterRemoveExpressionStatements = removeExpressionStatements.rewriter.getText();
+        System.out.println("afterRemoveExpressionStatements:\n" + afterRemoveExpressionStatements);
 
-        // finalresult
-        // System.out.println(removeExpressionStatements.rewriter.getText());
+        // we also need abstract user-defined methods keeping only return type
+        AbstractUsersMethods abstractUsersMethods = new AbstractUsersMethods(removeExpressionStatements.rewriter, declaredMethods);
+        walker.walk(abstractUsersMethods, tree);
+        String afterAbstractUsersMethods = abstractUsersMethods.rewriter.getText();
+        System.out.println("afterAbstractUsersMethods:\n" + afterAbstractUsersMethods);
+
+        //we also need to remove packagedeclaration
+        RemovePackageDeclaration removePackageDeclaration = new RemovePackageDeclaration(removeExpressionStatements.rewriter);
+        walker.walk(removePackageDeclaration, tree);
+        String afterRemovePackageDeclaration = removePackageDeclaration.rewriter.getText();
+        System.out.println("afterRemovePackageDeclaration:\n" + afterRemovePackageDeclaration);
+
+        // final result
+        return afterRemovePackageDeclaration;
     }
 
+    public static List<String> removeMainMethod(Set<String> methods) {
+        List<String> methodNames = new ArrayList<>();
+        methodNames.addAll(methods);
+        methodNames.removeAll(new ArrayList<>(Arrays.asList("main")));
+        return methodNames;
+    }
 }

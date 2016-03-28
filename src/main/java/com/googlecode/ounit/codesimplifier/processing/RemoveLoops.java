@@ -59,13 +59,15 @@ public class RemoveLoops extends Java8BaseListener {
     }
 
     private void removeForLoopsConditions(List<ParseTree> a, String conditionSeparator) {
-        int count = a.size();
-        for (int i = 2; i < count - 2; i++) {
-            if (a.get(i).getText().equals(conditionSeparator)) {
-                Interval interval = a.get(i).getSourceInterval();
-                rewriter.replace(tokens.get(interval.a), conditionSeparator);
-            } else {
-                Util.removeChild(a.get(i),rewriter);
+        if (a != null) {
+            int count = a.size();
+            for (int i = 2; i < count - 2; i++) {
+                if (a.get(i).getText().equals(conditionSeparator)) {
+                    Interval interval = a.get(i).getSourceInterval();
+                    rewriter.replace(tokens.get(interval.a), conditionSeparator);
+                } else {
+                    Util.removeChild(a.get(i), rewriter);
+                }
             }
         }
     }
@@ -85,18 +87,18 @@ public class RemoveLoops extends Java8BaseListener {
     @Override
     public void enterWhileStatement(@NotNull Java8Parser.WhileStatementContext ctx) {
         Interval interval = ctx.children.get(2).getSourceInterval();
-        Util.removeChildsTokens(interval,rewriter);
+        Util.removeChildsTokens(interval, rewriter);
     }
 
     @Override
     public void enterWhileStatementNoShortIf(@NotNull Java8Parser.WhileStatementNoShortIfContext ctx) {
         Interval interval = ctx.children.get(2).getSourceInterval();
-        Util.removeChildsTokens(interval,rewriter);
+        Util.removeChildsTokens(interval, rewriter);
     }
 
     @Override
     public void enterDoStatement(@NotNull Java8Parser.DoStatementContext ctx) {
         List<ParseTree> a = ctx.children;
-        Util.removeChild(a.get(4),rewriter);
+        Util.removeChild(a.get(4), rewriter);
     }
 }

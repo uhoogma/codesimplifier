@@ -21,7 +21,6 @@ public class FunctionListener extends Java8BaseListener {
     @Override
     public void enterMethodDeclarator(@NotNull Java8Parser.MethodDeclaratorContext ctx) {
         String currentFunctionName = ctx.Identifier().getText();
-        //  System.out.println("enterMethodDeclarator: " + currentFunctionName);
         functions.add(currentFunctionName);
     }
 }

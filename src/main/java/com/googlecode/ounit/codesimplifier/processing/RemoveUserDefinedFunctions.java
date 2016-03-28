@@ -71,14 +71,16 @@ public class RemoveUserDefinedFunctions extends Java8BaseListener {
         }
         insideMethodInvocation = false;
     }
-    
+
     @Override
     public void exitMethodInvocation(@NotNull Java8Parser.MethodInvocationContext ctx) {
         if (deleteArgumentList && declaredFunctions.contains(currentMethodName)) {
             List<ParseTree> pt = ctx.children;
-            for (int i = 0; i < pt.size(); i++) {
-                Interval interval = ctx.children.get(i).getSourceInterval();
-                Util.removeChildsTokens(interval, rewriter);
+            if (pt != null) {
+                for (int i = 0; i < pt.size(); i++) {
+                    Interval interval = ctx.children.get(i).getSourceInterval();
+                    Util.removeChildsTokens(interval, rewriter);
+                }
             }
         }
         deleteArgumentList = false;
@@ -89,9 +91,11 @@ public class RemoveUserDefinedFunctions extends Java8BaseListener {
     public void exitMethodInvocation_lfno_primary(@NotNull Java8Parser.MethodInvocation_lfno_primaryContext ctx) {
         if (deleteArgumentList && declaredFunctions.contains(currentMethodName)) {
             List<ParseTree> pt = ctx.children;
-            for (int i = 0; i < pt.size(); i++) {
-                Interval interval = ctx.children.get(i).getSourceInterval();
-                Util.removeChildsTokens(interval, rewriter);
+            if (pt != null) {
+                for (int i = 0; i < pt.size(); i++) {
+                    Interval interval = ctx.children.get(i).getSourceInterval();
+                    Util.removeChildsTokens(interval, rewriter);
+                }
             }
         }
         deleteArgumentList = false;

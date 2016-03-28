@@ -7,7 +7,7 @@ import org.antlr.v4.runtime.BufferedTokenStream;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.TokenStreamRewriter;
 import org.antlr.v4.runtime.misc.NotNull;
-
+import org.antlr.v4.runtime.tree.ParseTree;
 
 public class PreSimplifier extends Java8BaseListener {
 
@@ -62,18 +62,23 @@ public class PreSimplifier extends Java8BaseListener {
      */
     @Override
     public void enterLocalVariableDeclarationStatement(Java8Parser.LocalVariableDeclarationStatementContext ctx) {
-        List<Token> variableDeclarationTokens
-                = tokens.getTokens(ctx.getStart().getTokenIndex(), ctx.getStop().getTokenIndex());
-        if (variableDeclarationTokens != null) {
-            variableDeclarationTokens
-                    .stream()
-                    .filter((variableDeclarationToken) -> (variableDeclarationToken != null))
-                    .forEach((variableDeclarationToken) -> {
-                        rewriter.delete(variableDeclarationToken.getTokenIndex());
-                    });
+        List<ParseTree> pt = ctx.children;
+        if (pt != null) {
+            pt.stream().forEach((pt1) -> {
+                Util.removeChild(pt1, rewriter);
+            });
         }
     }
 
+    @Override
+    public void enterFieldDeclaration(Java8Parser.FieldDeclarationContext ctx) {
+        List<ParseTree> pt = ctx.children;
+        if (pt != null) {
+            pt.stream().forEach((pt1) -> {
+                Util.removeChild(pt1, rewriter);
+            });
+        }
+    }
     /*
      3. Format string : format strings are used to specify the types and 
      formats of the arguments supplied in I/O functions of the standard C 
@@ -98,6 +103,7 @@ public class PreSimplifier extends Java8BaseListener {
      contents of string arguments, leaving them in an abstracted form such 
      as ("").
      */
+
     @Override
     public void enterLiteral(@NotNull Java8Parser.LiteralContext ctx) {
         List<Token> literalTokens

@@ -1,10 +1,12 @@
 package main.java.com.googlecode.ounit.codesimplifier.processing;
 
 import main.java.com.googlecode.ounit.codesimplifier.Java8BaseListener;
-import java.util.ArrayList;
 import java.util.List;
-import org.antlr.v4.runtime.BufferedTokenStream;
+import main.java.com.googlecode.ounit.codesimplifier.Java8Parser;
 import org.antlr.v4.runtime.TokenStreamRewriter;
+import org.antlr.v4.runtime.misc.Interval;
+import org.antlr.v4.runtime.misc.NotNull;
+import org.antlr.v4.runtime.tree.ParseTree;
 
 public class RemoveExpressionStatements extends Java8BaseListener {
     /*
@@ -25,18 +27,54 @@ public class RemoveExpressionStatements extends Java8BaseListener {
      regular statements, but the argument expressions of the function calls
      left in the abstract code remain as they are.*/
 
-    BufferedTokenStream tokens;
-    TokenStreamRewriter rewriter;
-    List<String> declaredFunctions;
-    List<Integer> tokensToRemove;
+    public TokenStreamRewriter rewriter;
 
-    public RemoveExpressionStatements(BufferedTokenStream tokens, TokenStreamRewriter rewriter, List<String> declaredFunctions) {
-        this.tokens = tokens;
-        this.declaredFunctions = declaredFunctions;
+    private boolean insideMethodInvocation = false;
+
+    public RemoveExpressionStatements(TokenStreamRewriter rewriter) {
         this.rewriter = rewriter;
-        tokensToRemove = new ArrayList<>();
     }
-    
-    
-    
+
+    @Override
+    public void enterMethodInvocation(@NotNull Java8Parser.MethodInvocationContext ctx) {
+        insideMethodInvocation = true;
+    }
+
+    @Override
+    public void enterMethodInvocation_lf_primary(@NotNull Java8Parser.MethodInvocation_lf_primaryContext ctx) {
+        insideMethodInvocation = true;
+    }
+
+    @Override
+    public void enterMethodInvocation_lfno_primary(@NotNull Java8Parser.MethodInvocation_lfno_primaryContext ctx) {
+        insideMethodInvocation = true;
+    }
+
+    @Override
+    public void enterArgumentList(@NotNull Java8Parser.ArgumentListContext ctx) {
+        if (!insideMethodInvocation) {
+            List<ParseTree> pt = ctx.children;
+            if (pt != null) {
+                for (int i = 0; i < pt.size(); i++) {
+                    Interval interval = ctx.children.get(i).getSourceInterval();
+                    Util.removeChildsTokens(interval, rewriter);
+                }
+            }
+        }
+    }
+
+    @Override
+    public void exitMethodInvocation(@NotNull Java8Parser.MethodInvocationContext ctx) {
+        insideMethodInvocation = false;
+    }
+
+    @Override
+    public void exitMethodInvocation_lf_primary(@NotNull Java8Parser.MethodInvocation_lf_primaryContext ctx) {
+        insideMethodInvocation = false;
+    }
+
+    @Override
+    public void exitMethodInvocation_lfno_primary(@NotNull Java8Parser.MethodInvocation_lfno_primaryContext ctx) {
+        insideMethodInvocation = false;
+    }
 }
