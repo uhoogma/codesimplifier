@@ -25,7 +25,7 @@ public class Java2SimpleJava {
         processFile(FILE_PATH, "Quaternion.java");
     }
 
-    private static String processFile(String filePath, String fileName) {
+    public static String processFile(String filePath, String fileName) {
         String inputFile = null;
         try {
             inputFile = new String(Files.readAllBytes(Paths.get(
