@@ -32,12 +32,16 @@ public class AbstractUsersMethods extends Java8BaseListener {
     @Override
     public void exitMethodDeclaration(@NotNull Java8Parser.MethodDeclarationContext ctx) {
         if (deleteDeclaration) {
-            for (int i = modifiersInterval.a - 1; i <= modifiersInterval.b; i++) {
-                rewriter.delete(i);
-            }
-            for (int i = headerInterval.a - 1; i <= headerInterval.b; i++) {
-                if ((i >= headerInterval.a && i <= headerInterval.b) && (i < resultInterval.a || i > resultInterval.b)) {
+            if (modifiersInterval != null) {
+                for (int i = modifiersInterval.a - 1; i <= modifiersInterval.b; i++) {
                     rewriter.delete(i);
+                }
+            }
+            if (headerInterval != null && resultInterval != null) {
+                for (int i = headerInterval.a - 1; i <= headerInterval.b; i++) {
+                    if ((i >= headerInterval.a && i <= headerInterval.b) && (i < resultInterval.a || i > resultInterval.b)) {
+                        rewriter.delete(i);
+                    }
                 }
             }
         }
