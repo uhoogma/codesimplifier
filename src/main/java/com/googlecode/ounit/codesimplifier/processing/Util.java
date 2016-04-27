@@ -1,4 +1,4 @@
-package main.java.com.googlecode.ounit.codesimplifier.processing;
+package com.googlecode.ounit.codesimplifier.processing;
 
 import org.antlr.v4.runtime.TokenStreamRewriter;
 import org.antlr.v4.runtime.misc.Interval;

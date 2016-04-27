@@ -1,5 +1,7 @@
-package main.java.com.googlecode.ounit.codesimplifier.processing;
+package com.googlecode.ounit.codesimplifier.processing;
 
+import com.googlecode.ounit.codesimplifier.java2simplejava.Java8Lexer;
+import com.googlecode.ounit.codesimplifier.java2simplejava.Java8Parser;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -9,8 +11,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import main.java.com.googlecode.ounit.codesimplifier.Java8Lexer;
-import main.java.com.googlecode.ounit.codesimplifier.Java8Parser;
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.RuleContext;
@@ -19,9 +19,9 @@ import org.antlr.v4.runtime.tree.ParseTreeWalker;
 public class Java2SimpleJava {
 
     static final String FILE_PATH = "/home/urmas/NetBeansProjects/Antlr4/src/main/java/com/googlecode/ounit/codesimplifier/testcode/";
-
+    static final String SEMICOLON_REMOVAL_PATTERN ="(;(;+))";
+    
     public static void main(String[] args) {
-        // processFile(FILE_PATH, "Input2.java");
         processFile(FILE_PATH, "Quaternion.java");
     }
 
@@ -39,11 +39,13 @@ public class Java2SimpleJava {
         Java8Parser parser = new Java8Parser(tokens);
         RuleContext tree = parser.compilationUnit();
         ParseTreeWalker walker = new ParseTreeWalker();
-        // composing a list from userdefined functions 
-        FunctionListener collector = new FunctionListener();
+        // composing a list from userdefined function- and variablenames
+        UserDefinedNamesListener collector = new UserDefinedNamesListener();
         walker.walk(collector, tree);
         List<String> declaredMethods = removeMainMethod(collector.getFunctions());
+        Set<String> declaredVariables = collector.getVariables();
         System.out.println("declaredMethods:\n" + declaredMethods.toString());
+        System.out.println("declaredVariables:\n" + declaredVariables.toString());
         /*
          PreSimplifier
          1. annotations - remove including "@"
@@ -74,20 +76,20 @@ public class Java2SimpleJava {
         String afterRemoveLoops = removeLoops.rewriter.getText();
         System.out.println("afterRemoveLoops:\n" + afterRemoveLoops);
         /* 
-         RemoveUserDefinedFunctions 
+         RemoveUserDefinedNames 
          7a. user defined functions -remove all
          7b. system calls - keep intact 
          */
-        RemoveUserDefinedFunctions removeUserDefinedFunctions = new RemoveUserDefinedFunctions(removeLoops.rewriter, declaredMethods);
-        walker.walk(removeUserDefinedFunctions, tree);
-        String afterRemoveUserDefinedFunctions = removeUserDefinedFunctions.rewriter.getText();
-        System.out.println("afterRemoveUserDefinedFunctions:\n" + afterRemoveUserDefinedFunctions);
+        RemoveUserDefinedNames removeUserDefinedNames = new RemoveUserDefinedNames(removeLoops.rewriter, declaredMethods, declaredVariables);
+        walker.walk(removeUserDefinedNames, tree);
+        String afterRemoveUserDefinedNames = removeUserDefinedNames.rewriter.getText();
+        System.out.println("removeUserDefinedNames:\n" + afterRemoveUserDefinedNames);
         /* 
          RemoveExpressionStatements (InUserFunctionCalls)
          5a. expression statement in system call - keep
          5b. expression statement other - remove 
          */
-        RemoveExpressionStatements removeExpressionStatements = new RemoveExpressionStatements(removeUserDefinedFunctions.rewriter);
+        RemoveExpressionStatements removeExpressionStatements = new RemoveExpressionStatements(removeUserDefinedNames.rewriter);
         walker.walk(removeExpressionStatements, tree);
         String afterRemoveExpressionStatements = removeExpressionStatements.rewriter.getText();
         System.out.println("afterRemoveExpressionStatements:\n" + afterRemoveExpressionStatements);
@@ -103,9 +105,12 @@ public class Java2SimpleJava {
         walker.walk(removePackageDeclaration, tree);
         String afterRemovePackageDeclaration = removePackageDeclaration.rewriter.getText();
         System.out.println("afterRemovePackageDeclaration:\n" + afterRemovePackageDeclaration);
+ 
+        // remove leftover semicolons
+        String stripped = afterRemovePackageDeclaration.replaceAll(SEMICOLON_REMOVAL_PATTERN, "");
 
         // final result
-        return afterRemovePackageDeclaration;
+        return stripped;
     }
 
     public static List<String> removeMainMethod(Set<String> methods) {

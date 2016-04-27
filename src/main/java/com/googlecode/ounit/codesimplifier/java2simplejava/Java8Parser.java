@@ -1,5 +1,5 @@
 // Generated from /home/urmas/NetBeansProjects/SimpleCalc/src/simplecalc/javasimple/Java8.g4 by ANTLR 4.4
-package main.java.com.googlecode.ounit.codesimplifier;
+package com.googlecode.ounit.codesimplifier.java2simplejava;
 import org.antlr.v4.runtime.atn.*;
 import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.*;

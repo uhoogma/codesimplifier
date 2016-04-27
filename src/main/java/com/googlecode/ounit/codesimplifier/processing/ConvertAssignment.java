@@ -1,4 +1,4 @@
-package main.java.com.googlecode.ounit.codesimplifier.processing;
+package com.googlecode.ounit.codesimplifier.processing;
 
 import java.io.File;
 import java.io.FileNotFoundException;

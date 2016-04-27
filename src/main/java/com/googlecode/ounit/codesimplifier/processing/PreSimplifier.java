@@ -1,7 +1,7 @@
-package main.java.com.googlecode.ounit.codesimplifier.processing;
+package com.googlecode.ounit.codesimplifier.processing;
 
-import main.java.com.googlecode.ounit.codesimplifier.Java8BaseListener;
-import main.java.com.googlecode.ounit.codesimplifier.Java8Parser;
+import com.googlecode.ounit.codesimplifier.java2simplejava.Java8BaseListener;
+import com.googlecode.ounit.codesimplifier.java2simplejava.Java8Parser;
 import java.util.List;
 import org.antlr.v4.runtime.BufferedTokenStream;
 import org.antlr.v4.runtime.Token;

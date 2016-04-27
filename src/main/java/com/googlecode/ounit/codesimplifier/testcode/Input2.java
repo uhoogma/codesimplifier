@@ -1,4 +1,4 @@
-package main.java.com.googlecode.ounit.codesimplifier.testcode;
+package com.googlecode.ounit.codesimplifier.testcode;
 
 import java.util.ArrayList;
 import java.util.List;

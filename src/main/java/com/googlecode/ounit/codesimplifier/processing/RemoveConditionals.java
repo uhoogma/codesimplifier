@@ -1,13 +1,13 @@
-package main.java.com.googlecode.ounit.codesimplifier.processing;
+package com.googlecode.ounit.codesimplifier.processing;
 
-import main.java.com.googlecode.ounit.codesimplifier.Java8BaseListener;
-import main.java.com.googlecode.ounit.codesimplifier.Java8Parser;
+import com.googlecode.ounit.codesimplifier.java2simplejava.Java8BaseListener;
+import com.googlecode.ounit.codesimplifier.java2simplejava.Java8Parser;
 import java.util.List;
-import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.BufferedTokenStream;
 import org.antlr.v4.runtime.TokenStreamRewriter;
 import org.antlr.v4.runtime.misc.Interval;
 import org.antlr.v4.runtime.misc.NotNull;
+import org.antlr.v4.runtime.tree.ParseTree;
 
 public class RemoveConditionals extends Java8BaseListener {
     /*
