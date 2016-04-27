@@ -20,7 +20,9 @@ public class ConvertAssignment2 {
     public static String INTEGER_REGEX = "\\d+";
 
     public static void main(String[] args) {
-        CallListf("/home/urmas/tmp/", "treenode-2");
+        // CallListf("/home/urmas/tmp/", "treenode-2");
+        // CallListf("/home/urmas/tmp/", "GraphTask");
+        CallListf("/home/urmas/tmp/", "Puzzle");
     }
 
     private static void CallListf(String path1, String path2) {
